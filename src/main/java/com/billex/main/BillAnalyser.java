@@ -26,28 +26,30 @@ public class BillAnalyser {
         String startNumber = PropertyReader.getProperty(PROPERTY_MAP.CONSUMER_NUMBER_START);
         String endNumber = PropertyReader.getProperty(PROPERTY_MAP.CONSUMER_NUMBER_END);
 
-        HashMap<String, ArrayList<String>> consumerBillNumberSeries = billGen.getBillNumbersOfRangeOfConsumers(sectionCode,prefix,startNumber,endNumber);
+//        HashMap<String, ArrayList<String>> consumerBillNumberSeries = billGen.getBillNumbersOfRangeOfConsumers(sectionCode,prefix,startNumber,endNumber);
+        ArrayList<String> consumerList = billGen.getRangeOfConsumers(startNumber,endNumber);
+
         int index = 0;
-        for(String consumer:consumerBillNumberSeries.keySet()){
+        for(String consumerNumber:consumerList){
             index++;
-            ArrayList<String> billSeries = consumerBillNumberSeries.get(consumer);
-            for(String consumerNumber: billSeries)
-            {
-                BillStatus status = bill.downloadBillByConsumerNumber(consumerNumber);
-                Delay.addDelay(20);
+//            ArrayList<String> billSeries = consumerBillNumberSeries.get(consumer);
+//            for(String consumerNumber: billSeries)
+//            {
+                BillStatus status = bill.chooseSectionCodeAndDownloadBill(consumerNumber);
+                Delay.addDelay(10);
                 System.out.println("Processing consumer number "+consumerNumber+" and the status is "+status);
                 if(status.equals(BillStatus.GENERATED))
                 {
-                    String fileName="KsebBill_"+consumerNumber+".pdf";
+//                    String fileName="KsebBill_"+consumerNumber+".pdf";
                     PDFReader reader = new PDFReader();
-                    reader.readPDFFileAndWriteToCSVFile(index,fileName,csvFileName);
-                    break;
+                    reader.readPDFFileAndWriteToCSVFile(index,consumerNumber,csvFileName);
+
                 }else if(status.equals(BillStatus.PENDING))
                 {
                     TextFileWriter.appendDataToTextFile(pendingBillFileName,consumerNumber);
-                    break;
+
                 }
-            }
+//            }
 
 
 

@@ -5,6 +5,7 @@ import com.billex.utils.PropertyReader;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class BillNumberGenerator {
 
@@ -35,9 +36,9 @@ public class BillNumberGenerator {
        return billSeries;
    }
 
-   public HashMap<String,ArrayList<String>> getBillNumbersOfRangeOfConsumers(String sectionCode, String prefix, String startNumber, String endNumber)
+   public LinkedHashMap<String,ArrayList<String>> getBillNumbersOfRangeOfConsumers(String sectionCode, String prefix, String startNumber, String endNumber)
    {
-       HashMap<String,ArrayList<String>> consumerBillMap = new HashMap<String,ArrayList<String>>();
+       LinkedHashMap<String,ArrayList<String>> consumerBillMap = new LinkedHashMap<String,ArrayList<String>>();
 
        int start = Integer.parseInt(startNumber);
        int end = Integer.parseInt(endNumber);
@@ -52,6 +53,21 @@ public class BillNumberGenerator {
 
    }
 
+    public ArrayList<String> getRangeOfConsumers(String startNumber, String endNumber)
+    {
+        ArrayList<String> consumerList = new ArrayList<String>();
+
+        int start = Integer.parseInt(startNumber);
+        int end = Integer.parseInt(endNumber);
+        for(int i= start; i<end;i++)
+        {
+           consumerList.add(i+"");
+        }
+
+        return consumerList;
+
+    }
+
 
     public static void main(String[] args) {
 
@@ -62,11 +78,13 @@ public class BillNumberGenerator {
         String startNumber = PropertyReader.getProperty(PROPERTY_MAP.CONSUMER_NUMBER_START);
         String endNumber = PropertyReader.getProperty(PROPERTY_MAP.CONSUMER_NUMBER_END);
 
-        HashMap<String,ArrayList<String>> consumerBillNumberSeries = billGen.getBillNumbersOfRangeOfConsumers(sectionCode,prefix,startNumber,endNumber);
-        for(String consumer:consumerBillNumberSeries.keySet()){
-            ArrayList<String> billSeries = consumerBillNumberSeries.get(consumer);
-            System.out.println(consumer + "\t" + "->" + "\t" + billSeries);
+//        HashMap<String,ArrayList<String>> consumerBillNumberSeries = billGen.getBillNumbersOfRangeOfConsumers(sectionCode,prefix,startNumber,endNumber);
+//        for(String consumer:consumerBillNumberSeries.keySet()){
+//            ArrayList<String> billSeries = consumerBillNumberSeries.get(consumer);
+//            System.out.println(consumer + "\t" + "->" + "\t" + billSeries);
+//
+//        }
 
-        }
+        System.out.println(billGen.getRangeOfConsumers(startNumber,endNumber));
     }
 }

@@ -14,8 +14,9 @@ public interface PROPERTY_MAP {
     String EMAIL_TEXT = "Reg. E-mail:";
     String BILL_NUMBER_TEXT = "Bill#";
     String AVG_CONSUMPTION_TEXT = "KWH";
-    String NET_PAYABLE_TEXT = "Net Payable";
+    String NET_PAYABLE_TEXT = "Total Amt.(";
     String TOTAL_UNITS_TEXT = "KWH Cumulative Import";
     String CSV_OUTPUT_FILE_NAME = "CSV_OUTPUT_FILE_NAME";
     String PENDING_BILL_CONSUMERS_FILE = "PENDING_BILL_CONSUMERS_FILE";
+    String BILLING_PERIOD_TEXT = "Billing Period";
 }

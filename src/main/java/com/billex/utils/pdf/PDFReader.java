@@ -9,6 +9,7 @@ import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.PDFTextStripperByArea;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,8 +74,17 @@ public class PDFReader {
     {
         int lineNumber = getFirstLineNumberOfSpecificText( lines,PROPERTY_MAP.NET_PAYABLE_TEXT);
         String [] lineData = lines[lineNumber].split(" ");
-        String netAmount = lineData[5].trim();
+        String netAmount = lineData[13].trim();
         return netAmount;
+    }
+
+    String extractBillingPeriod(String lines[])
+    {
+        int lineNumber = getFirstLineNumberOfSpecificText( lines,PROPERTY_MAP.BILLING_PERIOD_TEXT);
+        String [] lineData = lines[lineNumber].split(" ");
+        String billingPeriodData = lineData[5].trim();
+        String billingPeriod = billingPeriodData.substring(billingPeriodData.indexOf('[')+1,billingPeriodData.indexOf(']'));
+        return billingPeriod;
     }
 
     String extractTotalUnits(String lines[])
@@ -100,10 +110,31 @@ public class PDFReader {
 
         return sb.toString();
     }
+
+    public File getMatchingFileNameByConsumerNumber(String consumerNumber)
+    {
+        // your directory
+        File f = new File(FilePath.PDF_DIR_PATH);
+        File[] matchingFiles = f.listFiles(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return  name.endsWith(consumerNumber+".pdf");
+            }
+        });
+        if (matchingFiles.length>1)
+        {
+            System.out.println("#@#@#@@ There is more than one file with consumer number "+consumerNumber+" , But choosing the first file "+matchingFiles[0].getAbsolutePath());
+        }
+
+        return matchingFiles[0];
+    }
+
     
     public String readPDFAndGetContent(String fileName) throws IOException {
         String pdfFileInText = null;
-        try (PDDocument document = PDDocument.load(new File(FilePath.PDF_DIR_PATH+fileName))) {
+
+        File filePath = getMatchingFileNameByConsumerNumber(fileName);
+
+        try (PDDocument document = PDDocument.load(filePath)) {
 
             document.getClass();
 
@@ -145,23 +176,26 @@ public class PDFReader {
        String avgConsumption = extractAvgConsumption(lines);
         String netAmount = extractNetAmount(lines);
         String totalUnit = extractTotalUnits(lines);
-        String[] record = {String.valueOf(index),consNumber,address,consMobileNumber,consEmail,billNumber,avgConsumption,netAmount,totalUnit};
+        String billingPeriod = extractBillingPeriod(lines);
+        String[] record = {String.valueOf(index),consNumber,address,consMobileNumber,consEmail,billNumber,avgConsumption,netAmount,totalUnit,billingPeriod};
         csvData.add(record);
         csvFileWriter.writeDataToCSVFile(csvData,csvPath);
 
     }
 
     public static void main(String[] args) throws IOException {
-        String fileName="KsebBill_1156200002916.pdf";
+        String fileName="2609";
         String csvPath = "output.csv";
         PDFReader reader = new PDFReader();
 
-//        String content = reader.readPDFAndGetContent(fileName);
-//        String lines[] = content.split("\\r?\\n");
-//        System.out.println(reader.extractNetAmount(lines));
+        String content = reader.readPDFAndGetContent(fileName);
+        String lines[] = content.split("\\r?\\n");
+        System.out.println(reader.extractBillingPeriod(lines));
 
-//        csvFileWriter.writeCSVFileHeaderValues(csvPath);
-       reader.readPDFFileAndWriteToCSVFile(1,fileName,csvPath);
+        csvFileWriter.writeCSVFileHeaderValues(csvPath);
+       reader.readPDFFileAndWriteToCSVFile(2,fileName,csvPath);
+//        System.out.println(reader.getMatchingFileNameByConsumerNumber("16"));
+
 
     }
 }
