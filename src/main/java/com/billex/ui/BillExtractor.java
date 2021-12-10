@@ -87,7 +87,7 @@ public class BillExtractor {
 
     public static void main(String[] args) {
         BillExtractor bill = new BillExtractor();
-        bill.chooseSectionCodeAndDownloadBill("2609");
+        bill.chooseSectionCodeAndDownloadBill("28025");
 
     }
 }

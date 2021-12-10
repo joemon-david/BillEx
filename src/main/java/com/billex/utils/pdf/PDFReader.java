@@ -11,6 +11,10 @@ import org.apache.pdfbox.text.PDFTextStripperByArea;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -134,6 +138,7 @@ public class PDFReader {
 
         File filePath = getMatchingFileNameByConsumerNumber(fileName);
 
+
         try (PDDocument document = PDDocument.load(filePath)) {
 
             document.getClass();
@@ -162,29 +167,45 @@ public class PDFReader {
     }
 
 
-    public void readPDFFileAndWriteToCSVFile(int index,String fileName,String csvPath) throws IOException {
+    public void readPDFFileAndWriteToCSVFile(int index,String consumerNumber,String csvPath) throws IOException {
 
 
-        String content = readPDFAndGetContent(fileName);
+        String content = readPDFAndGetContent(consumerNumber);
         String lines[] = content.split("\\r?\\n");
         List<String[]> csvData = new ArrayList<>();
-       String consNumber = extractConsumerNumber(lines);
-       String address = extractAddress(lines);
-        String consMobileNumber = extractConsumerMobileNumber(lines);
-        String consEmail = extractConsumerEmail(lines);
-        String billNumber = extractConsumerBillNumber(lines);
-       String avgConsumption = extractAvgConsumption(lines);
-        String netAmount = extractNetAmount(lines);
-        String totalUnit = extractTotalUnits(lines);
-        String billingPeriod = extractBillingPeriod(lines);
-        String[] record = {String.valueOf(index),consNumber,address,consMobileNumber,consEmail,billNumber,avgConsumption,netAmount,totalUnit,billingPeriod};
-        csvData.add(record);
-        csvFileWriter.writeDataToCSVFile(csvData,csvPath);
+
+
+
+        try {
+            String consNumber = extractConsumerNumber(lines);
+            String address = extractAddress(lines);
+            String consMobileNumber = extractConsumerMobileNumber(lines);
+            String consEmail = extractConsumerEmail(lines);
+            String billNumber = extractConsumerBillNumber(lines);
+            String avgConsumption = extractAvgConsumption(lines);
+            String netAmount = extractNetAmount(lines);
+            String totalUnit = extractTotalUnits(lines);
+            String billingPeriod = extractBillingPeriod(lines);
+            String[] record = {String.valueOf(index),consNumber,address,consMobileNumber,consEmail,billNumber,avgConsumption,netAmount,totalUnit,billingPeriod};
+            csvData.add(record);
+            csvFileWriter.writeDataToCSVFile(csvData,csvPath);
+
+        }catch (ArrayIndexOutOfBoundsException e){
+            System.out.println("Error  occurred while reading the content from file for consumer "+consumerNumber);
+            File filePath = getMatchingFileNameByConsumerNumber(consumerNumber);
+            String fileName = filePath.getName();
+            String todFilePath = FilePath.TOD_DIR_PATH+fileName;
+            Path fromPath = Paths.get(filePath.getPath());
+            Path toPath = Paths.get(todFilePath);
+            Files.copy(fromPath,toPath, StandardCopyOption.REPLACE_EXISTING);
+
+        }
+
 
     }
 
     public static void main(String[] args) throws IOException {
-        String fileName="2609";
+        String fileName="28025";
         String csvPath = "output.csv";
         PDFReader reader = new PDFReader();
 
