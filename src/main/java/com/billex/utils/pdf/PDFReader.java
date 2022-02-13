@@ -26,7 +26,7 @@ public class PDFReader {
     private int  getFirstLineNumberOfSpecificText(String lines[], String specificText)
     {
 
-        int ln=0;
+        int ln=-1;
                 for (int lineNumber = 0; lineNumber<lines.length; lineNumber++ ) {
                     String line = lines[lineNumber];
                     if (line.contains(specificText))
@@ -36,7 +36,8 @@ public class PDFReader {
                     }
 
                 }
-
+    if(ln==-1)
+        System.out.println(specificText+" is not found on the page");
                 return ln;
     }
 
@@ -45,6 +46,8 @@ public class PDFReader {
     {
     String consumerNumber = null;
     int lineNumber = getFirstLineNumberOfSpecificText( lines,PROPERTY_MAP.CONSUMER_NUMBER_TEXT);
+    if(lineNumber==-1)
+        return "Data Not found in the page";
     consumerNumber = lines[lineNumber].split(" ")[1].trim();
     return consumerNumber;
     }
@@ -52,12 +55,16 @@ public class PDFReader {
     String extractConsumerMobileNumber(String lines[])
     {
         int lineNumber = getFirstLineNumberOfSpecificText( lines,PROPERTY_MAP.ADDRESS_END_TEXT);
+        if(lineNumber==-1)
+            return "Data Not found in the page";
         String mobileNumber = lines[lineNumber].split(" ")[2].trim();
         return mobileNumber;
     }
     String extractConsumerEmail(String lines[])
     {
         int lineNumber = getFirstLineNumberOfSpecificText( lines,PROPERTY_MAP.EMAIL_TEXT);
+        if(lineNumber==-1)
+            return "Data Not found in the page";
         String email = lines[lineNumber].split(" ")[2].trim();
         return email;
     }
@@ -65,18 +72,24 @@ public class PDFReader {
     String extractConsumerBillNumber(String lines[])
     {
         int lineNumber = getFirstLineNumberOfSpecificText( lines,PROPERTY_MAP.BILL_NUMBER_TEXT);
+        if(lineNumber==-1)
+            return "Data Not found in the page";
         String billNumber = lines[lineNumber].split(" ")[1].replace("Bill#","").trim();
         return billNumber;
     }
     String extractAvgConsumption(String lines[])
     {
         int lineNumber = getFirstLineNumberOfSpecificText( lines,PROPERTY_MAP.AVG_CONSUMPTION_TEXT);
+        if(lineNumber==-1)
+            return "Data Not found in the page";
         String avgConsumption = lines[lineNumber].split(" ")[1].trim();
         return avgConsumption;
     }
     String extractNetAmount(String lines[])
     {
         int lineNumber = getFirstLineNumberOfSpecificText( lines,PROPERTY_MAP.NET_PAYABLE_TEXT);
+        if(lineNumber==-1)
+            return "Data Not found in the page";
         String [] lineData = lines[lineNumber].split(" ");
         String netAmount = lineData[13].trim();
         return netAmount;
@@ -85,6 +98,8 @@ public class PDFReader {
     String extractBillingPeriod(String lines[])
     {
         int lineNumber = getFirstLineNumberOfSpecificText( lines,PROPERTY_MAP.BILLING_PERIOD_TEXT);
+        if(lineNumber==-1)
+            return "Data Not found in the page";
         String [] lineData = lines[lineNumber].split(" ");
         String billingPeriodData = lineData[5].trim();
         String billingPeriod = billingPeriodData.substring(billingPeriodData.indexOf('[')+1,billingPeriodData.indexOf(']'));
@@ -94,7 +109,8 @@ public class PDFReader {
     String extractTotalUnits(String lines[])
     {
         int lineNumber = getFirstLineNumberOfSpecificText( lines,PROPERTY_MAP.TOTAL_UNITS_TEXT);
-
+        if(lineNumber==-1)
+            return "Data Not found in the page";
         String [] lineArray = StringUtility.removeNullAndEmpty(lines[lineNumber].split(" "));//[5].trim();
 
         return lineArray[6];
@@ -153,7 +169,7 @@ public class PDFReader {
                 pdfFileInText = tStripper.getText(document);
 //                System.out.println(pdfFileInText);
 
-                // split by whitespace
+//                 split by whitespace
 //                String lines[] = pdfFileInText.split("\\r?\\n");
 //                for (String line : lines) {
 //                    System.out.println(line);
@@ -191,6 +207,7 @@ public class PDFReader {
             csvFileWriter.writeDataToCSVFile(csvData,csvPath);
 
         }catch (ArrayIndexOutOfBoundsException e){
+            e.printStackTrace();
             System.out.println("Error  occurred while reading the content from file for consumer "+consumerNumber);
             File filePath = getMatchingFileNameByConsumerNumber(consumerNumber);
             String fileName = filePath.getName();
@@ -205,13 +222,13 @@ public class PDFReader {
     }
 
     public static void main(String[] args) throws IOException {
-        String fileName="28025";
+        String fileName="29025";
         String csvPath = "output.csv";
         PDFReader reader = new PDFReader();
 
         String content = reader.readPDFAndGetContent(fileName);
         String lines[] = content.split("\\r?\\n");
-        System.out.println(reader.extractBillingPeriod(lines));
+        System.out.println(reader.extractConsumerMobileNumber(lines));
 
         csvFileWriter.writeCSVFileHeaderValues(csvPath);
        reader.readPDFFileAndWriteToCSVFile(2,fileName,csvPath);
